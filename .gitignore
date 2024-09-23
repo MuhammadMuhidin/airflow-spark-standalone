@@ -2,3 +2,5 @@
 /logs/*
 /notebooks/*
 !/notebooks/*.ipynb
+/data/*
+!/data/raw/*

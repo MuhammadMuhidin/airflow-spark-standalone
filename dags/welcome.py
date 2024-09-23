@@ -1,9 +1,11 @@
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.python_operator import PythonOperator
 from airflow.sensors.filesystem import FileSensor
 from airflow.utils.dates import days_ago
 from datetime import timedelta
 from airflow import DAG
+from src_landing_hist import SrcToLanding, LandingToHist
 
 spark_scripts_path = '{{var.json.sparkscripts.path}}'
 sensor_file_path = '{{var.json.sensorfile.path}}'
@@ -40,7 +42,15 @@ def spark_job(task_id, application, **kwargs):
         application_args=[kwargs['extra_args']],
         dag=dag
     )
-    
+
+def src_landing_hist(command, from_path, to_path):
+    if command == 'src2landing':
+        src_to_landing = SrcToLanding(from_path, to_path)
+        src_to_landing.save_landing()
+    elif command == 'landing2hist':
+        landing_to_hist = LandingToHist(from_path, to_path)
+        landing_to_hist.save_hist()
+
 items_list = [
     {
         'uid': '1', 'task_id': 'first', 'msg': 'this is message from first.'
@@ -59,7 +69,21 @@ precheck_file = file_check(
     filepath=sensor_file_path
 )
 
-start >> precheck_file >> wait
+src2landing = PythonOperator(
+    task_id='src2landing',
+    python_callable=src_landing_hist,
+    op_kwargs={ 'command': 'src2landing', 'from_path':'/data/raw', 'to_path':'/data/landing' },
+    dag=dag
+)
+
+landing2hist = PythonOperator(
+    task_id='landing2hist',
+    python_callable=src_landing_hist,
+    op_kwargs={ 'command': 'landing2hist', 'from_path':'/data/landing', 'to_path':'/data/hist' },
+    dag=dag
+)
+
+start >> precheck_file >> src2landing >> landing2hist >> wait
 
 for item in items_list:
     submit_spark =spark_job(
