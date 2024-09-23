@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  jupyter:
+    container_name: ${JUPYTER_CONTAINER_NAME}
+    hostname: ${JUPYTER_CONTAINER_NAME}
+    image: mumix/jupyter
+    ports:
+      - ${JUPYTER_PORT}:8888
+      - 4040:4040
+      - 4041:4041
+    volumes:
+      - ../notebooks:/home/jovyan/
+
+networks:
+  default:
+    name: mumix-network
+    external: true

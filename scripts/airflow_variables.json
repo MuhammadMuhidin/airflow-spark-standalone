@@ -1,0 +1,8 @@
+{
+    "sparkscripts": {
+        "path": "/spark-scripts"
+    },
+    "sensorfile": {
+        "path":"/opt/airflow/dags/file_sensor.txt"
+    }
+}
