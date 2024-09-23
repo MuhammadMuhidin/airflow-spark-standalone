@@ -1,4 +1,5 @@
 .env
+.venv/*
 /logs/*
 /notebooks/*
 !/notebooks/*.ipynb
