@@ -6,12 +6,10 @@ build :
 
 up :
 	@docker compose -f ./docker/docker_compose_spark.yml --env-file .env up -d
-	@docker compose -f ./docker/docker_compose_postgres.yml --env-file .env up -d
 	@docker compose -f ./docker/docker_compose_airflow.yml --env-file .env up -d
 	@docker compose -f ./docker/docker_compose_jupyter.yml --env-file .env up -d
 
 down :
 	@docker compose -f ./docker/docker_compose_spark.yml down
-	@docker compose -f ./docker/docker_compose_postgres.yml down
 	@docker compose -f ./docker/docker_compose_airflow.yml down
 	@docker compose -f ./docker/docker_compose_jupyter.yml down
