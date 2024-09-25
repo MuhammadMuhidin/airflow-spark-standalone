@@ -8,6 +8,7 @@ services:
     environment:
       - SPARK_MODE=master
     volumes:
+      - ../data:/data
       - ../spark-scripts:/spark-scripts
     ports:
       - ${SPARK_MASTER_UI}:8080
@@ -23,6 +24,7 @@ services:
       - SPARK_WORKER_MEMORY=1G
       - SPARK_WORKER_CORES=1
     volumes:
+      - ../data:/data
       - ../spark-scripts:/spark-scripts
     depends_on:
       - spark-master
