@@ -1,5 +1,20 @@
 version: '3.7'
 
+x-airflow-default: 
+  &airflow-default
+  environment:
+    - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}/${POSTGRES_DB}
+    - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    - SPARK_MASTER_HOST_NAME=${SPARK_MASTER_HOST_NAME}
+    - SPARK_MASTER_PORT=${SPARK_MASTER_PORT}
+  volumes:
+    - ../dags:/opt/airflow/dags
+    - ../logs:/opt/airflow/logs
+    - ../spark-scripts:/spark-scripts
+    - ../scripts:/scripts
+    - ../data:/data
+
+
 services:
   scheduler:
     image: mumix/airflow
@@ -7,17 +22,7 @@ services:
     hostname: ${AIRFLOW_SCHEDULER_CONTAINER_NAME}
     command: scheduler
     restart: always
-    environment:
-      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}/${POSTGRES_DB}
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - SPARK_MASTER_HOST_NAME=${SPARK_MASTER_HOST_NAME}
-      - SPARK_MASTER_PORT=${SPARK_MASTER_PORT}
-    volumes:
-      - ../dags:/opt/airflow/dags
-      - ../logs:/opt/airflow/logs
-      - ../spark-scripts:/spark-scripts
-      - ../scripts:/scripts
-      - ../data:/data
+    <<: *airflow-common
 
   webserver:
     image: mumix/airflow
@@ -27,17 +32,7 @@ services:
     restart: always
     depends_on:
       - scheduler
-    environment:
-      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}/${POSTGRES_DB}
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - SPARK_MASTER_HOST_NAME=${SPARK_MASTER_HOST_NAME}
-      - SPARK_MASTER_PORT=${SPARK_MASTER_PORT}
-    volumes:
-      - ../dags:/opt/airflow/dags
-      - ../logs:/opt/airflow/logs
-      - ../spark-scripts:/spark-scripts
-      - ../scripts:/scripts
-      - ../data:/data
+    <<: *airflow-common
     ports:
       - ${AIRFLOW_WEBSERVER_PORT}:8080
 
