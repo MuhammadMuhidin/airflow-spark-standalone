@@ -2,6 +2,8 @@ version: '3.7'
 
 x-airflow-default: 
   &airflow-default
+  image: mumix/airflow
+  restart: always
   environment:
     - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}/${POSTGRES_DB}
     - AIRFLOW__CORE__EXECUTOR=LocalExecutor
@@ -17,22 +19,18 @@ x-airflow-default:
 
 services:
   scheduler:
-    image: mumix/airflow
+    <<: *airflow-default
     container_name: ${AIRFLOW_SCHEDULER_CONTAINER_NAME}
     hostname: ${AIRFLOW_SCHEDULER_CONTAINER_NAME}
     command: scheduler
-    restart: always
-    <<: *airflow-common
 
   webserver:
-    image: mumix/airflow
+    <<: *airflow-default
     container_name: ${AIRFLOW_WEBSERVER_CONTAINER_NAME}
     hostname: ${AIRFLOW_WEBSERVER_CONTAINER_NAME}
     entrypoint: /scripts/entrypoint.sh
-    restart: always
     depends_on:
       - scheduler
-    <<: *airflow-common
     ports:
       - ${AIRFLOW_WEBSERVER_PORT}:8080
 
