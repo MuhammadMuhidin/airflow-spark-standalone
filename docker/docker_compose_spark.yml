@@ -13,9 +13,9 @@ services:
       - ${SPARK_MASTER_UI}:8080
       - ${SPARK_MASTER_PORT}:7077
 
-  spark-worker-1:
+  spark-worker:
     &worker_default
-    container_name: ${SPARK_WORKER_CONTAINER_NAME}-1
+    container_name: ${SPARK_WORKER_CONTAINER_NAME}
     image: mumix/spark
     command: start-worker.sh spark://${SPARK_MASTER_HOST_NAME}:${SPARK_MASTER_PORT}
     volumes:
@@ -23,10 +23,6 @@ services:
       - ../spark-scripts:/spark-scripts
     depends_on:
       - spark-master
-
-  # spark-worker-2:
-  #   <<: *worker_default
-  #   container_name: ${SPARK_WORKER_CONTAINER_NAME}-2
 
   spark-history:
     container_name: spark-history
