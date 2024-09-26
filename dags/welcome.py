@@ -1,11 +1,14 @@
+from datetime import timedelta
+
+from src_landing_hist import SrcToLanding, LandingToHist
+
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
-from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
+from airflow.operators.dummy_operator import DummyOperator
 from airflow.sensors.filesystem import FileSensor
 from airflow.utils.dates import days_ago
-from datetime import timedelta
 from airflow import DAG
-from src_landing_hist import SrcToLanding, LandingToHist
+
 
 spark_scripts_path = '{{var.json.sparkscripts.path}}'
 sensor_file_path = '{{var.json.sensorfile.path}}'

@@ -5,8 +5,7 @@ services:
     container_name: ${SPARK_MASTER_CONTAINER_NAME}
     hostname: ${SPARK_MASTER_HOST_NAME}
     image: mumix/spark
-    environment:
-      - SPARK_MODE=master
+    command: start-master.sh -p ${SPARK_MASTER_PORT}
     volumes:
       - ../data:/data
       - ../spark-scripts:/spark-scripts
@@ -18,11 +17,7 @@ services:
     &worker_default
     container_name: ${SPARK_WORKER_CONTAINER_NAME}-1
     image: mumix/spark
-    environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://${SPARK_MASTER_HOST_NAME}:${SPARK_MASTER_PORT}
-      - SPARK_WORKER_MEMORY=1G
-      - SPARK_WORKER_CORES=1
+    command: start-worker.sh spark://${SPARK_MASTER_HOST_NAME}:${SPARK_MASTER_PORT}
     volumes:
       - ../data:/data
       - ../spark-scripts:/spark-scripts
@@ -32,6 +27,17 @@ services:
   # spark-worker-2:
   #   <<: *worker_default
   #   container_name: ${SPARK_WORKER_CONTAINER_NAME}-2
+
+  spark-history:
+    container_name: spark-history
+    image: mumix/spark
+    command: start-history-server.sh
+    depends_on:
+      - spark-master
+    volumes:
+      - ../logs/spark-events:/tmp/spark-events
+    ports:
+      - '18080:18080'
 
 networks:
   default:

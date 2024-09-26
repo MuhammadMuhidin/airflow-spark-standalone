@@ -1,6 +1,6 @@
-import os, sys
-from dotenv import load_dotenv
 from pyspark.sql import SparkSession
+from dotenv import load_dotenv
+import os, sys
 
 load_dotenv(dotenv_path='/opt/app/.env')
 spark_master_hostname = os.getenv('SPARK_MASTER_HOST_NAME')
@@ -11,6 +11,9 @@ spark = (
     .builder
     .appName('Welcome')
     .config('spark.master', f'spark://{spark_master_hostname}:{spark_port}')
+    .config('spark.eventLog.enabled', 'true')
+    .config('spark.eventLog.dir', '/tmp/spark-events')
+    .config('spark.history.fs.logDirectory', '/tmp/spark-events')
     .getOrCreate()
 )
 spark.sparkContext.setLogLevel('WARN')
