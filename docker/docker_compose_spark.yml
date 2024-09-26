@@ -14,7 +14,6 @@ services:
       - ${SPARK_MASTER_PORT}:7077
 
   spark-worker:
-    &worker_default
     container_name: ${SPARK_WORKER_CONTAINER_NAME}
     image: mumix/spark
     command: start-worker.sh spark://${SPARK_MASTER_HOST_NAME}:${SPARK_MASTER_PORT}
@@ -25,15 +24,15 @@ services:
       - spark-master
 
   spark-history:
-    container_name: spark-history
+    container_name: ${SPARK_HISTORY_CONTAINER_NAME}
     image: mumix/spark
     command: start-history-server.sh
-    depends_on:
-      - spark-master
     volumes:
       - ../logs/spark-events:/tmp/spark-events
+    depends_on:
+      - spark-master
     ports:
-      - '18080:18080'
+      - ${SPARK_HISTORY_UI}:18080
 
 networks:
   default:
